@@ -74,7 +74,7 @@ class KNearestNeighbor(object):
         # not use a loop over dimension.                                    #
         #####################################################################
 
-        dists[i,j] = np.sum(np.abs(X[i] - self.X_train[j]))
+        dists[i,j] = np.sum(np.abs(self.X_train[j] - X[i]))
 
         #####################################################################
         #                       END OF YOUR CODE                            #
@@ -97,7 +97,9 @@ class KNearestNeighbor(object):
       # Compute the l2 distance between the ith test point and all training #
       # points, and store the result in dists[i, :].                        #
       #######################################################################
-      pass
+
+      dists[i] = np.sum(np.abs(self.X_train - X[i]), axis=1)
+
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
