@@ -11,7 +11,7 @@ pip install pillow
 sudo apt-get build-dep python-imaging
 sudo apt-get install libjpeg8 libjpeg62-dev libfreetype6 libfreetype6-dev
 sudo pip install virtualenv  
-virtualenv .env                  # Create a virtual environment
+virtualenv -p python3 .env       # Create a virtual environment
 source .env/bin/activate         # Activate the virtual environment
 pip install -r requirements.txt  # Install dependencies
 deactivate
