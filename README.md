@@ -1,5 +1,5 @@
 # cs231n-lecture-notes
-My lecture notes of cs231n of Andrej Karpathy and Solutions for assignments
+My lecture notes of cs231n of Andrej Karpathy and Solutions for assignments.
 
 ## Notes :notebook:
 
@@ -11,4 +11,4 @@ My lecture notes of cs231n of Andrej Karpathy and Solutions for assignments
 ## Solutions :microscope:
 
 - Assignment 1
-  - [Q1 k-Nearest Neighbor classifier](./assignment1-q1-solution.ipynb)
+  - [Q1 k-Nearest Neighbor classifier](./assignment1/knn.ipynb)
