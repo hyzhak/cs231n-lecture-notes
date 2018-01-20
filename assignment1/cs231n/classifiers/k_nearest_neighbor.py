@@ -74,7 +74,7 @@ class KNearestNeighbor(object):
         # not use a loop over dimension.                                    #
         #####################################################################
 
-        dists[i,j] = np.sum(np.abs(self.X_train[j] - X[i]))
+        dists[i,j] = np.sqrt(np.sum(np.square(self.X_train[j] - X[i])))
 
         #####################################################################
         #                       END OF YOUR CODE                            #
@@ -98,7 +98,7 @@ class KNearestNeighbor(object):
       # points, and store the result in dists[i, :].                        #
       #######################################################################
 
-      dists[i] = np.sum(np.abs(self.X_train - X[i]), axis=1)
+      dists[i] = np.sqrt(np.sum(np.square(self.X_train - X[i]), axis=1))
 
       #######################################################################
       #                         END OF YOUR CODE                            #
@@ -127,7 +127,13 @@ class KNearestNeighbor(object):
     # HINT: Try to formulate the l2 distance using matrix multiplication    #
     #       and two broadcast sums.                                         #
     #########################################################################
-    pass
+
+    x_sqr = np.sum(np.square(X), axis = 1, keepdims=True)
+    x_train = X.dot(self.X_train.T)
+    train_sqr = np.sum(np.square(self.X_train), axis = 1, keepdims=True).T
+
+    dists = np.sqrt(x_sqr - 2 * x_train + train_sqr)
+
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################
