@@ -57,6 +57,8 @@ def svm_loss_naive(W, X, y, reg):
   #############################################################################
 
   dW /= num_train
+  # derivative of regularization
+  dW += 2 * reg * W
 
   return loss, dW
 
