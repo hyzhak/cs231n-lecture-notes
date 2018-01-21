@@ -11,5 +11,5 @@ My lecture notes of cs231n of Andrej Karpathy and Solutions for assignments.
 ## Solutions :microscope:
 
 - Assignment 1
-  - [Q1 k-Nearest Neighbor classifier](./assignment1/knn.ipynb)
-  - [Q2 Multiclass Support Vector Machine exercise](./assignment1/svm.ipynb)
+  - [Q1 k-Nearest Neighbor classifier](./assignment1/knn.ipynb) **DONE**
+  - [Q2 Multiclass Support Vector Machine exercise](./assignment1/svm.ipynb) **DONE**
