@@ -30,15 +30,18 @@ def svm_loss_naive(W, X, y, reg):
     scores = X[i].dot(W)
     correct_class_score = scores[y[i]]
     for j in xrange(num_classes):
-      if j == y[i]:
-        # ME: update dW
-        dW[:, j] -= (scores > correct_class_score - 1).sum()*X[i]
+      correct_class = y[i]
+      if j == correct_class:
         continue
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
         # ME: update dW
+        # contribute to delta
         dW[:, j] += X[i]
+        # in additional contribute to delta of correct class
+        dW[:, correct_class] -= X[i]
+        # ME: end of my update
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
@@ -81,14 +84,14 @@ def svm_loss_vectorized(W, X, y, reg):
   scores = X.dot(W)
 
   # use y as index and extract correct scores
-  correct_class_scores = scores[np.arange(num_train), y]
-  margin = scores - np.expand_dims(correct_class_scores, axis=1) + 1
+  correct_class_scores = scores[range(num_train), y]
+  margins = scores - np.expand_dims(correct_class_scores, axis=1) + 1
   # remove correct classes from margins
-  margin[np.arange(y.shape[0]), y] = 0
+  margins[np.arange(y.shape[0]), y] = 0
   # only positive margins
-  positive_margin = np.maximum(0.0, margin)
+  non_neg_margins = np.maximum(0.0, margins)
   # mean by training examples
-  loss = positive_margin.sum() / float(num_train)
+  loss = non_neg_margins.sum() / float(num_train)
   # regularization
   loss += reg * np.sum(W * W)
   #############################################################################
@@ -105,7 +108,18 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  num_classes = W.shape[1]
+
+  coeff_mat = np.zeros((num_train, num_classes))
+  # take into account any class which crossed a margin
+  coeff_mat[non_neg_margins > 0] = 1
+  # all of incorrect classes contribute to correct class for single sample
+  coeff_mat[range(num_train), y] = -np.sum(coeff_mat, axis=1)
+
+  # current values define scale of delta
+  dW = X.T.dot(coeff_mat)
+  dW /= num_train 
+  dW += 2 * reg * W    
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
