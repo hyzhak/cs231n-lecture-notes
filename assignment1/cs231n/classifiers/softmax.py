@@ -23,6 +23,7 @@ def softmax_loss_naive(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
+  num_train = X.shape[0]
 
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using explicit loops.     #
@@ -30,10 +31,19 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  for i, x in enumerate(X):
+    scores = x.dot(W)
+    correct_class_score = scores[y[i]]
+    loss += -scores[y[i]] + np.log(np.exp(scores).sum())
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
+  # Right now the loss is a sum over all training examples, but we want it
+  # to be an average instead so we divide by num_train.
+  loss /= num_train
+
+  # Add regularization to the loss.
+  loss += reg * np.sum(W * W)
 
   return loss, dW
 
