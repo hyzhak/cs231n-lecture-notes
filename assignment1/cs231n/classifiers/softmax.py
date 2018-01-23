@@ -34,6 +34,8 @@ def softmax_loss_naive(W, X, y, reg):
   num_classes = W.shape[1]
   for i, x in enumerate(X):
     f = x.dot(W)
+    #shift the values of f so that the highest number is 0:
+    f -= np.max(f)
     p_norm = np.exp(f).sum()
     loss += -f[y[i]] + np.log(p_norm)
 
