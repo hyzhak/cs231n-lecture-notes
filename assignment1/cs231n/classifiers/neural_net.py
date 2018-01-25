@@ -99,11 +99,11 @@ class TwoLayerNet(object):
     #############################################################################
     exp_scores = np.exp(scores)
     p_norm = exp_scores.sum(axis=1, keepdims=True)
-    prop_of_classes = exp_scores / p_norm
-    assert prop_of_classes.shape == (N, C), f'{prop_of_classes.shape} == ({N}, {C})'
+    prob_of_classes = exp_scores / p_norm
+    assert prob_of_classes.shape == (N, C), f'{prob_of_classes.shape} == ({N}, {C})'
 
     # data loss
-    loss = -np.log(prop_of_classes[range(N), y]).sum() / N
+    loss = -np.log(prob_of_classes[range(N), y]).sum() / N
 
     # TODO: hm, why do we try to increase probability of target class only?
     # Maybe we could increase model accuracy by trying to decrease probability
@@ -127,22 +127,55 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    
+
     # 1-hot vector
+
     y_one_hot = np.zeros((N, C))
     y_one_hot[range(N), y] = 1.0
 
+    # Computational graph
+    #
+    # dW1 <- dRulu <- dW2 <- dsoftmax <- dy
+    # db1             db2
+    #
+
+    dy = prob_of_classes - y_one_hot
+    dy/=N
+
     # layer 2
-    #p = np.exp(scores) / np.expand_dims(p_norm, axis=1)
-    #p[range(num_train), y] = p[range(num_train), y] - 1
-    #dW = X.T.dot(p)
+
+    db2 = dy.sum(axis=0)
+    dW2 = layer_1.T.dot(dy)
+
+    assert db2.shape == b2.shape, f'{db2.shape} == {b2.shape}'
+    assert dW2.shape == W2.shape, f'{dW2.shape} == {W2.shape}'
 
     # layer 1
+    
+    dlayer_1 = dy.dot(W2.T)
+    
+    # if we would need dlayer_1 we could copy dlayer_1 to drelu
+    drelu = dlayer_1
+    drelu[layer_1 <=- 0] = 0.0
 
-    #############################################################################
-    #                              END OF YOUR CODE                             #
-    #############################################################################
+    db1 = drelu.sum(axis=0)
+    dW1 = X.T.dot(drelu)
 
+    assert dlayer_1.shape == layer_1.shape, f'{dlayer_1.shape} == {layer_1.shape}'
+    assert db1.shape == b1.shape, f'{db1.shape} == {b1.shape}'
+    assert dW1.shape == W1.shape, f'{dW1.shape} == {W1.shape}'
+
+    # regularization
+
+    dW1 += 2 * reg * W1
+    dW2 += 2 * reg * W2
+        
+    grads = {
+        'W1': dW1,
+        'b1': db1,
+        'W2': dW2,
+        'b2': db2,
+    }
     return loss, grads
 
   def train(self, X, y, X_val, y_val,
