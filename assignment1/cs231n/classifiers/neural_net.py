@@ -208,14 +208,13 @@ class TwoLayerNet(object):
     val_acc_history = []
 
     for it in xrange(num_iters):
-      X_batch = None
-      y_batch = None
-
       #########################################################################
       # TODO: Create a random minibatch of training data and labels, storing  #
       # them in X_batch and y_batch respectively.                             #
       #########################################################################
-      pass
+      batch_ids = np.random.choice(range(num_train), batch_size)
+      X_batch = X[batch_ids]
+      y_batch = y[batch_ids]
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
@@ -230,7 +229,8 @@ class TwoLayerNet(object):
       # using stochastic gradient descent. You'll need to use the gradients   #
       # stored in the grads dictionary defined above.                         #
       #########################################################################
-      pass
+      for param_name, param in grads.items():
+        self.params[param_name] -= learning_rate * param
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
