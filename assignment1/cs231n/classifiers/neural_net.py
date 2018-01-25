@@ -69,6 +69,9 @@ class TwoLayerNet(object):
     W2, b2 = self.params['W2'], self.params['b2']
     N, D = X.shape
 
+    C1 = W1.shape[1]
+    C = W2.shape[1]
+
     # Compute the forward pass
     #############################################################################
     # TODO: Perform the forward pass, computing the class scores for the input. #
@@ -78,6 +81,7 @@ class TwoLayerNet(object):
     #ReLU(f) by difinition is np.maximum(f, 0)
     layer_1 = np.maximum(X.dot(W1) + b1, 0)
     scores = layer_1.dot(W2) + b2
+    assert scores.shape == (N, C), f'{scores.shape} == ({N}, {C})'
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -96,12 +100,13 @@ class TwoLayerNet(object):
     exp_scores = np.exp(scores)
     p_norm = exp_scores.sum(axis=1, keepdims=True)
     prop_of_classes = exp_scores / p_norm
+    assert prop_of_classes.shape == (N, C), f'{prop_of_classes.shape} == ({N}, {C})'
 
     # data loss
     loss = -np.log(prop_of_classes[range(N), y]).sum() / N
 
-    # TODO: hm, why do we try to increase probability of target class?
-    # maybe we could increase model accuracy by trying to decrease probability
+    # TODO: hm, why do we try to increase probability of target class only?
+    # Maybe we could increase model accuracy by trying to decrease probability
     # of the rest classes?
     #
     # Should try. But maybe it won't work because some labels even 
@@ -123,6 +128,10 @@ class TwoLayerNet(object):
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
     
+    # 1-hot vector
+    y_one_hot = np.zeros((N, C))
+    y_one_hot[range(N), y] = 1.0
+
     # layer 2
     #p = np.exp(scores) / np.expand_dims(p_norm, axis=1)
     #p[range(num_train), y] = p[range(num_train), y] - 1
