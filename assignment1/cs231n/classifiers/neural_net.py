@@ -93,8 +93,22 @@ class TwoLayerNet(object):
     # in the variable loss, which should be a scalar. Use the Softmax           #
     # classifier loss.                                                          #
     #############################################################################
-    p_norm = np.exp(scores).sum(axis=1)
-    loss = (np.log(p_norm) - scores[range(N), y]).sum() / N
+    exp_scores = np.exp(scores)
+    p_norm = exp_scores.sum(axis=1, keepdims=True)
+    prop_of_classes = exp_scores / p_norm
+
+    # data loss
+    loss = -np.log(prop_of_classes[range(N), y]).sum() / N
+
+    # TODO: hm, why do we try to increase probability of target class?
+    # maybe we could increase model accuracy by trying to decrease probability
+    # of the rest classes?
+    #
+    # Should try. But maybe it won't work because some labels even 
+    # for human look similar and we also could have images like 
+    # human in front of a car but have only single label - 'human'...
+
+    # regularization loss
     loss += reg * np.sum(W1 * W1)
     loss += reg * np.sum(W2 * W2)
     #############################################################################
@@ -108,7 +122,14 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    pass
+    
+    # layer 2
+    #p = np.exp(scores) / np.expand_dims(p_norm, axis=1)
+    #p[range(num_train), y] = p[range(num_train), y] - 1
+    #dW = X.T.dot(p)
+
+    # layer 1
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
