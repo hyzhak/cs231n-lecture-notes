@@ -11,7 +11,11 @@ My lecture notes of cs231n of Andrej Karpathy and Solutions for assignments.
 ## Solutions :microscope:
 
 - Assignment 1
-  - [Q1 k-Nearest Neighbor classifier](./assignment1/knn.ipynb) **DONE**
-  - [Q2 Multiclass Support Vector Machine (SVM)](./assignment1/svm.ipynb) **DONE**
-  - [Q3 Softmax](./assignment1/softmax.ipynb) **DONE**
-  - [Q4: Two-Layer Neural Network](./assignment1/two_layer_net.ipynb) **IN PROGRESS**
+  - [Q1: k-Nearest Neighbor classifier](./assignment1/knn.ipynb) **DONE**
+  - [Q2: Multiclass Support Vector Machine (SVM)](./assignment1/svm.ipynb) **DONE**
+  - [Q3: Softmax](./assignment1/softmax.ipynb) **DONE**
+  - [Q4: Two-Layer Neural Network](./assignment1/two_layer_net.ipynb) **DONE**
+  - [Q5: Higher Level Representations: Image Features](./assignment1/features.ipynb) **DONE**
+
+- Assignment 2
+  - [Q1 Fully-connected Neural Network](./assignment2/FullyConnectedNets.ipynb) **IN PROGRESS**
