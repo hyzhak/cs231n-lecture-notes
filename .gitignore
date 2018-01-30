@@ -101,4 +101,4 @@ ENV/
 .mypy_cache/
 
 # datasets
-assignment1/cs231n/datasets/cifar-10-batches-py
+assignment?/cs231n/datasets/cifar-10-batches-py
