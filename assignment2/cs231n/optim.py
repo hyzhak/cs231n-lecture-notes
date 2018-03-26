@@ -65,7 +65,13 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    pass
+
+    # integrated velocity
+    v = config['momentum'] * v - config['learning_rate'] * dw
+
+    # intergrate position
+    next_w = w + v
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -99,7 +105,12 @@ def rmsprop(x, dx, config=None):
     # in the next_x variable. Don't forget to update cache value stored in    #
     # config['cache'].                                                        #
     ###########################################################################
-    pass
+    cache = config['cache']
+    
+    cache = config['decay_rate'] * cache + (1 - config['decay_rate']) * dx**2
+    next_x = x - config['learning_rate'] * dx / (np.sqrt(cache + config['epsilon']))
+
+    config['cache'] = cache
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -136,7 +147,32 @@ def adam(x, dx, config=None):
     # the next_x variable. Don't forget to update the m, v, and t variables   #
     # stored in config.                                                       #
     ###########################################################################
-    pass
+    m = config['m']
+    v = config['v']
+    beta1 = config['beta1']
+    beta2 = config['beta2']
+    learning_rate = config['learning_rate']
+    epsilon = config['epsilon']
+    
+    # for me this is a strange place.
+    # in the original formula we should use t
+    # http://ruder.io/optimizing-gradient-descent/index.html#adam
+    # but here we should use t + 1 instead
+    t = config['t'] + 1
+
+    m = beta1 * m + (1 - beta1) * dx
+    v = beta2 * v + (1 - beta2) * (dx**2)
+    
+    # bias correction (which works in very few steps)
+    mb = m / (1 - beta1 ** t)
+    vb = v / (1 - beta2 ** t)
+
+    next_x = x - learning_rate * mb / (np.sqrt(vb) + epsilon)
+    
+    config['m'] = m
+    config['v'] = v
+    config['t'] = t
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
