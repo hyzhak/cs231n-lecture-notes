@@ -437,7 +437,38 @@ def conv_forward_naive(x, w, b, conv_param):
     # TODO: Implement the convolutional forward pass.                         #
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
-    pass
+    (N, C, H, W) = x.shape
+    (F, C, HH, WW) = w.shape
+
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+    
+    H_out = 1 + (H + 2 * pad - HH) // stride
+    W_out = 1 + (W + 2 * pad - WW) // stride
+    
+    x_pad = np.pad(x, ((0,), (0,), (pad, ), (pad,)), mode='constant', constant_values=0)
+
+    out = np.zeros((N, F, H_out, W_out))
+    
+    HH_half = (HH - 1) // 2
+    WW_half = (WW - 1) // 2
+    
+    for h_out in range(H_out):
+        for w_out in range(W_out):
+            # h_center = stride * h_out + pad
+            # w_center = stride * w_out + pad
+            # window = x_pad[:,:, h_center - HH_left:h_center + HH_right, w_center - WW_left:w_center + WW_right]
+
+            h_center = stride * h_out + pad - HH_half
+            w_center = stride * w_out + pad - WW_half
+            window = x_pad[:,:, h_center:h_center + HH, w_center:w_center + WW]
+
+            for f in range(F):
+                one_filter  = w[f, :, :, :]
+                out[:, f, h_out, w_out] = np.sum(window * one_filter, axis=(1,2,3))
+
+    out = out + b[None, :, None, None]
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -462,7 +493,39 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
-    pass
+    (x, w, b, conv_param) = cache
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+    (N, C, H, W) = x.shape
+    (F, C, HH, WW) = w.shape    
+
+    H_out = 1 + (H + 2 * pad - HH) // stride
+    W_out = 1 + (W + 2 * pad - WW) // stride
+
+    x_pad = np.pad(x, ((0,), (0,), (pad, ), (pad,)), mode='constant', constant_values=0)
+
+    db = dout.sum(axis = (0,2,3))
+
+    HH_half = (HH - 1) // 2
+    WW_half = (WW - 1) // 2
+
+    # Initializing dX, dW with the correct shapes
+    dx_pad = np.zeros(x_pad.shape)
+    dw = np.zeros(w.shape)
+
+    for h_out in range(H_out):
+        for w_out in range(W_out):
+            h_center = stride * h_out + pad - HH_half
+            w_center = stride * w_out + pad - WW_half
+            window = x_pad[:,:, h_center:h_center + HH, w_center:w_center + WW]
+            for f in range(F):
+                one_filter = w[f, :, :, :]
+                m = dout[:, f, h_out, w_out]
+                dx_pad[:, :, h_center:h_center + HH, w_center:w_center + WW] += np.multiply.outer(m, one_filter)
+                dw[f,:,:,:] += np.dot(window.T, m).T
+
+    dx = dx_pad[:,:,pad:-pad,pad:-pad]
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
