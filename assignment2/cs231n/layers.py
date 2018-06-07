@@ -483,6 +483,10 @@ def conv_backward_naive(dout, cache):
     Inputs:
     - dout: Upstream derivatives.
     - cache: A tuple of (x, w, b, conv_param) as in conv_forward_naive
+    
+    Some helpful explonation could be find there:
+    - https://medium.com/@2017csm1006/forward-and-backpropagation-in-convolutional-neural-network-4dfa96d7b37e
+    - https://becominghuman.ai/back-propagation-in-convolutional-neural-networks-intuition-and-code-714ef1c38199
 
     Returns a tuple of:
     - dx: Gradient with respect to x
@@ -551,7 +555,20 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # TODO: Implement the max pooling forward pass                            #
     ###########################################################################
-    pass
+    (N, C, H, W) = x.shape
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    out_H = H // stride
+    out_W = W // stride
+    out = np.zeros((N, C, out_H, out_W))
+    
+    for h in range(out_H):
+        for w in range(out_W):
+            xx = h * stride
+            yy = w * stride
+            out[:,:,h,w] = np.max(x[:,:,xx:xx + pool_height,yy:yy + pool_width], axis=(2,3))
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -574,7 +591,28 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the max pooling backward pass                           #
     ###########################################################################
-    pass
+    (x, pool_param) = cache
+
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    
+    dx = np.zeros_like(x)
+
+    (N, C, H, W) = dout.shape
+    for h in range(H):
+        for w in range(W):
+            xx = h * stride
+            yy = w * stride
+            # find which x were contribute to the out
+            x_frame = x[:,:,xx:xx + pool_height,yy:yy + pool_width]
+            # x_frame has shape = [number_of_samples, features] but should be [number_of_samples, features, h, w]
+            # or at least [number_of_samples, features, 1, 1]
+            # in other words operation "*[:,:,None,None]" changes dimesion 
+            # from [number_of_samples, features] to [number_of_samples, features, 1, 1]
+            x_mask = x_frame == x_frame.max(axis=(2,3))[:,:,None,None]
+            dx[:,:,xx:xx + pool_height,yy:yy + pool_width] += dout[:,:,h,w][:,:,None,None] * x_mask
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -612,7 +650,11 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     # version of batch normalization defined above. Your implementation should#
     # be very short; ours is less than five lines.                            #
     ###########################################################################
-    pass
+    N, C, H, W = x.shape
+    # put channel at the last dimention and stretch all dimensions except the last one
+    flat_output, cache = batchnorm_forward(x.transpose(0,2,3,1).reshape((N*H*W,C)), gamma, beta, bn_param)
+    # revert dimensions
+    out = flat_output.reshape(N,H,W,C).transpose(0,3,1,2)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -642,7 +684,9 @@ def spatial_batchnorm_backward(dout, cache):
     # version of batch normalization defined above. Your implementation should#
     # be very short; ours is less than five lines.                            #
     ###########################################################################
-    pass
+    N, C, H, W = dout.shape
+    flat_dx, dgamma, dbeta = batchnorm_backward(dout.transpose(0,2,3,1).reshape((N*H*W,C)), cache)
+    dx = flat_dx.reshape(N,H,W,C).transpose(0,3,1,2)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
