@@ -1,3 +1,7 @@
 *.swp
 *.pyc
 .env/*
+
+# exclude snapshots because it is binary
+# and also we may like to iterate many times on it
+snapshots
