@@ -43,7 +43,7 @@ def estimate_model(model, X_train, y_train, X_val, y_val):
             learning_rate=learning_rate,
             learning_rate_value=model.get('learning_rate', 1e-3),
             part_of_dataset=model.get('part_of_dataset', 1.0),
-            snapshot_name=f'{model["group"]}/{model["name"]}'.replace(' ', '-').lower(),
+            snapshot_name=f'{model["group"]}/{model["name"]}'.replace(' ', '-').replace(':', '').lower(),
         )
         train_time = time.perf_counter() - train_time
         print('training time (seconds)', train_time)
