@@ -1,8 +1,9 @@
-import tensorflow as tf
-import numpy as np
 import math
-import time
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import time
+import tensorflow as tf
 
 
 def run_model(sess, X, y, is_training, predict, loss_val, Xd, yd,
@@ -32,6 +33,18 @@ def run_model(sess, X, y, is_training, predict, loss_val, Xd, yd,
     iter_cnt = 0
 
     saver = tf.train.Saver()
+    snapshot_filename = None
+    if snapshot_name:
+        snapshot_filename = f'./snapshots/{snapshot_name}/model'
+        snapshot_dir = f'./snapshots/{snapshot_name}'
+        try:
+            saver.restore(sess, snapshot_filename)
+            print(f'restored snapshot {snapshot_filename}')
+        except tf.errors.InvalidArgumentError:
+            # can't load data
+            print(f'haven\'t restore snapshot {snapshot_filename}')
+            pass
+
     for e in range(epochs):
         # keep track of losses and accuracy
         correct = 0
@@ -87,6 +100,8 @@ def run_model(sess, X, y, is_training, predict, loss_val, Xd, yd,
             plt.show()
 
         if training_now and snapshot_name is not None:
-            save_path = saver.save(sess, f'./snapshots/{snapshot_name}/model')
+            if not os.path.exists(snapshot_dir):
+                os.makedirs(snapshot_dir)
+            save_path = saver.save(sess, snapshot_filename)
             print(f'Model saved in path: {save_path}')
     return total_loss, total_correct, all_losses, all_correct
