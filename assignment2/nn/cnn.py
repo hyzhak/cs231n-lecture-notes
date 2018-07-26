@@ -10,9 +10,6 @@ def cnn(idx, X, filters, kernel_size, is_training,
     bconv = tf.get_variable(f'bconv{idx}', shape=[filters])
     out = tf.nn.conv2d(X, filter=Wconv, strides=strides, padding=padding) + bconv
 
-    # ReLU Activation Layer
-    out = tf.nn.relu(out)
-
     # Spatial Batch Normalization Layer (trainable parameters, with scale and centering)
     # axis=3 channel axis
     if use_batchnorm:
@@ -20,5 +17,8 @@ def cnn(idx, X, filters, kernel_size, is_training,
 
     if dropout is not None:
         out = tf.layers.dropout(out, rate=dropout, training=is_training)
+
+    # ReLU Activation Layer
+    out = tf.nn.relu(out)
 
     return out, [Wconv, bconv]
