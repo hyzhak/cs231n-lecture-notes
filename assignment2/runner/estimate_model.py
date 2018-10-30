@@ -76,7 +76,7 @@ def estimate_model(model, X_train, y_train, X_val, y_val):
             'time': validation_time,
         }
 
-        # estimate how much time it would get to predict
+        # estimate how much time it would get to prediction
         print('predict')
         validation_time = time.perf_counter()
         run_model(

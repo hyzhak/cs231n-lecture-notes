@@ -6,7 +6,8 @@ import time
 import tensorflow as tf
 
 
-def run_model(sess, X, y, is_training, predict, loss_val, Xd, yd,
+def run_model(sess, X, y, is_training, predict, loss_val,
+              Xd, yd,
               epochs=1, batch_size=64, print_every=100,
               training=None, plot_losses=False, learning_rate=None, learning_rate_value=10e-3, part_of_dataset=1.0,
               snapshot_name=None,
@@ -74,6 +75,11 @@ def run_model(sess, X, y, is_training, predict, loss_val, Xd, yd,
             # have tensorflow compute loss and correct predictions
             # and (if given) perform a training step
             loss, corr, _ = sess.run(variables, feed_dict=feed_dict)
+
+            # TODO:
+            # - we may want to calculate validation accuracy here
+            # - maybe we need to store dynamic of accuracy (trainging) on each 10 (100) samples
+            # or even each epoch
 
             # aggregate performance stats
             losses.append(loss * actual_batch_size)
